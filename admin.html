@@ -2,11 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>لوحة التحكم - ASH</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <h2>لوحة التحكم - الطلبات</h2>
+
+<p><button id="logout-btn">تسجيل الخروج</button></p>
+
 <table id="bookings-table" border="1" cellpadding="5" cellspacing="0">
   <thead>
     <tr>
@@ -18,37 +22,38 @@
       <th>حالة الطلب</th>
     </tr>
   </thead>
-  <tbody>
-    <!-- الطلبات ستظهر هنا -->
-  </tbody>
+  <tbody></tbody>
 </table>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
   authDomain: "admin-ash-f622c.firebaseapp.com",
   projectId: "admin-ash-f622c",
   storageBucket: "admin-ash-f622c.firebasestorage.app",
   messagingSenderId: "76505742154",
-  appId: "1:76505742154:web:dc4f190f9f2de80acb1fb3",
-  measurementId: "G-MNPL104YPN"
+  appId: "1:76505742154:web:590ca78470cbe708cb1fb3",
+  measurementId: "G-0N1HEG1XRG"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-// عرض الطلبات
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href = "login.html";
+  else loadBookings();
+});
+
 async function loadBookings() {
   const tableBody = document.querySelector("#bookings-table tbody");
-  tableBody.innerHTML = ""; // تفريغ الجدول قبل التحميل
-
+  tableBody.innerHTML = "";
   const querySnapshot = await getDocs(collection(db, "bookings"));
-  querySnapshot.forEach((doc) => {
+  querySnapshot.forEach(doc => {
     const data = doc.data();
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -63,7 +68,9 @@ async function loadBookings() {
   });
 }
 
-loadBookings();
+document.getElementById("logout-btn").addEventListener("click", () => {
+  signOut(auth).then(() => window.location.href = "login.html");
+});
 </script>
 </body>
 </html>

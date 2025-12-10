@@ -9,7 +9,7 @@
 <body>
 <header class="site-header">
   <div class="logo">ASH Window Cleaning</div>
-  <nav><a href="index.html">الرئيسية</a> | <a href="admin.html">لوحة التحكم</a></nav>
+  <nav><a href="index.html">الرئيسية</a> | <a href="login.html">لوحة التحكم</a></nav>
 </header>
 
 <main class="container">
@@ -17,23 +17,23 @@
   <form id="booking-form">
     <label>الاسم</label>
     <input type="text" name="name" required>
-    
+
     <label>رقم الهاتف</label>
     <input type="text" name="phone" required>
-    
+
     <label>الخدمة</label>
     <select name="service">
       <option>تنظيف النوافذ</option>
       <option>تنظيف الواجهات</option>
       <option>خدمات دورية</option>
     </select>
-    
+
     <label>العنوان</label>
     <input type="text" name="address">
-    
+
     <label>التاريخ</label>
     <input type="date" name="date">
-    
+
     <button type="submit">إرسال الطلب</button>
   </form>
   <p id="msg"></p>
@@ -80,4 +80,9 @@ bookingForm.addEventListener('submit', async function(e) {
     bookingForm.reset();
   } catch(err) {
     console.error(err);
-    document.getElementById('msg
+    document.getElementById('msg').textContent = '❌ حدث خطأ أثناء حفظ الطلب.';
+  }
+});
+</script>
+</body>
+</html>

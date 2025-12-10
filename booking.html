@@ -9,7 +9,7 @@
 <body>
 <header class="site-header">
   <div class="logo">ASH Window Cleaning</div>
-  <nav><a href="index.html">الرئيسية</a> | <a href="login.html">لوحة التحكم</a></nav>
+  <nav><a href="booking.html">احجز خدمة</a> | <a href="login.html">لوحة التحكم</a></nav>
 </header>
 
 <main class="container">
@@ -56,28 +56,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const bookingForm = document.getElementById('booking-form');
+const form = document.getElementById("booking-form");
+const msg = document.getElementById("msg");
 
-bookingForm.addEventListener('submit', async function(e) {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = {
-    name: bookingForm.name.value.trim(),
-    phone: bookingForm.phone.value.trim(),
-    service: bookingForm.service.value,
-    address: bookingForm.address.value.trim(),
-    date: bookingForm.date.value || '',
+    name: form.name.value.trim(),
+    phone: form.phone.value.trim(),
+    service: form.service.value,
+    address: form.address.value.trim(),
+    date: form.date.value || '',
     status: 'new',
     createdAt: serverTimestamp()
   };
 
   try {
-    await addDoc(collection(db, 'bookings'), data);
-    document.getElementById('msg').textContent = '✔ تم إرسال الطلب وحفظه بنجاح!';
-    bookingForm.reset();
-  } catch(err) {
+    await addDoc(collection(db, "bookings"), data);
+    msg.textContent = "✔ تم إرسال الطلب وحفظه بنجاح!";
+    form.reset();
+  } catch (err) {
     console.error(err);
-    document.getElementById('msg').textContent = '❌ حدث خطأ أثناء حفظ الطلب.';
+    msg.textContent = "❌ حدث خطأ أثناء حفظ الطلب.";
   }
 });
 </script>

@@ -43,22 +43,19 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
   authDomain: "admin-ash-f622c.firebaseapp.com",
   projectId: "admin-ash-f622c",
   storageBucket: "admin-ash-f622c.firebasestorage.app",
   messagingSenderId: "76505742154",
-  appId: "1:76505742154:web:dc4f190f9f2de80acb1fb3",
-  measurementId: "G-MNPL104YPN"
+  appId: "1:76505742154:web:590ca78470cbe708cb1fb3",
+  measurementId: "G-0N1HEG1XRG"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// فورم الحجز
 const bookingForm = document.getElementById('booking-form');
 
 bookingForm.addEventListener('submit', async function(e) {

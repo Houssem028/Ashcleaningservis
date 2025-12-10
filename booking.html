@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>احجز خدمة - ASH</title>
 <link rel="stylesheet" href="style.css">
+<!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <header class="site-header">
@@ -39,48 +42,48 @@
   <p id="msg"></p>
 </main>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
-  authDomain: "admin-ash-f622c.firebaseapp.com",
-  projectId: "admin-ash-f622c",
-  storageBucket: "admin-ash-f622c.firebasestorage.app",
-  messagingSenderId: "76505742154",
-  appId: "1:76505742154:web:590ca78470cbe708cb1fb3",
-  measurementId: "G-0N1HEG1XRG"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const form = document.getElementById("booking-form");
-const msg = document.getElementById("msg");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const data = {
-    name: form.name.value.trim(),
-    phone: form.phone.value.trim(),
-    service: form.service.value,
-    address: form.address.value.trim(),
-    date: form.date.value || '',
-    status: 'new',
-    createdAt: serverTimestamp()
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
+    authDomain: "admin-ash-f622c.firebaseapp.com",
+    projectId: "admin-ash-f622c",
+    storageBucket: "admin-ash-f622c.firebasestorage.app",
+    messagingSenderId: "76505742154",
+    appId: "1:76505742154:web:590ca78470cbe708cb1fb3",
+    measurementId: "G-0N1HEG1XRG"
   };
 
-  try {
-    await addDoc(collection(db, "bookings"), data);
-    msg.textContent = "✔ تم إرسال الطلب وحفظه بنجاح!";
-    form.reset();
-  } catch (err) {
-    console.error(err);
-    msg.textContent = "❌ حدث خطأ أثناء حفظ الطلب.";
-  }
-});
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const form = document.getElementById("booking-form");
+  const msg = document.getElementById("msg");
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const data = {
+      name: form.name.value.trim(),
+      phone: form.phone.value.trim(),
+      service: form.service.value,
+      address: form.address.value.trim(),
+      date: form.date.value || '',
+      status: 'new',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    db.collection("bookings").add(data)
+      .then(() => {
+        msg.textContent = "✔ تم إرسال الطلب وحفظه بنجاح!";
+        form.reset();
+      })
+      .catch(err => {
+        console.error(err);
+        msg.textContent = "❌ حدث خطأ أثناء حفظ الطلب.";
+      });
+  });
 </script>
 </body>
 </html>

@@ -1,43 +1,54 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>تسجيل دخول - Admin</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل الدخول - ASH</title>
 <link rel="stylesheet" href="style.css">
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 </head>
 <body>
-<header class="site-header"><div class="logo">ASH Admin</div></header>
-<main class="container">
-  <h2>تسجيل دخول المدير</h2>
-  <input id="email" placeholder="البريد الإلكتروني" />
-  <input id="password" type="password" placeholder="كلمة السر" />
-  <button id="loginBtn" class="btn">دخول</button>
-  <p id="loginMsg"></p>
-  <p>ملاحظة: إن لم تقم بإنشاء حساب Admin، ادخل لوحة Firebase Authentication وأنشئ مستخدم بالإيميل admin@ash.tn</p>
-</main>
+<h2>تسجيل الدخول للوحة التحكم</h2>
+<form id="login-form">
+  <label>البريد الإلكتروني</label>
+  <input type="email" id="email" required>
 
-<script>
-// paste your firebaseConfig here (same as booking page)
+  <label>كلمة المرور</label>
+  <input type="password" id="password" required>
+
+  <button type="submit">تسجيل الدخول</button>
+</form>
+<p id="login-msg"></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
+  authDomain: "admin-ash-f622c.firebaseapp.com",
+  projectId: "admin-ash-f622c",
+  storageBucket: "admin-ash-f622c.firebasestorage.app",
+  messagingSenderId: "76505742154",
+  appId: "1:76505742154:web:590ca78470cbe708cb1fb3",
+  measurementId: "G-0N1HEG1XRG"
 };
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 
-document.getElementById('loginBtn').addEventListener('click', function(){
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+document.getElementById('login-form').addEventListener('submit', (e) => {
+  e.preventDefault();
   const email = document.getElementById('email').value.trim();
-  const pass = document.getElementById('password').value.trim();
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(()=> { window.location.href = 'admin.html'; })
-    .catch(err => { document.getElementById('loginMsg').textContent = 'خطأ في الدخول: ' + err.message; });
+  const password = document.getElementById('password').value.trim();
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      window.location.href = "admin.html";
+    })
+    .catch(err => {
+      document.getElementById('login-msg').textContent = "❌ البريد أو كلمة المرور غير صحيحة";
+      console.error(err);
+    });
 });
 </script>
 </body>

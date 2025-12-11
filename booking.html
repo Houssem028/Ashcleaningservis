@@ -16,6 +16,10 @@
 </head>
 <body>
 
+<div style="text-align:center; margin-bottom:20px;">
+  <img src="logo.png" alt="ASH Window Cleaning" style="max-width:200px;">
+</div>
+
 <h2>احجز خدمة</h2>
 
 <form id="booking-form">
@@ -44,7 +48,7 @@
 <p id="msg"></p>
 
 <script>
-// ===== Firebase Config =====
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
   authDomain: "admin-ash-f622c.firebaseapp.com",
@@ -53,15 +57,13 @@ const firebaseConfig = {
   messagingSenderId: "76505742154",
   appId: "1:76505742154:web:dc4f190f9f2de80acb1fb3"
 };
-
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Initialize EmailJS
+// EmailJS
 emailjs.init("dKDZhGvgDZ2OwDlZF");
 
-// ===== On Submit =====
+// Submit Handler
 document.getElementById("booking-form").addEventListener("submit", function(e){
   e.preventDefault();
 
@@ -70,15 +72,13 @@ document.getElementById("booking-form").addEventListener("submit", function(e){
     phone: document.getElementById("phone").value.trim(),
     service: document.getElementById("service").value,
     address: document.getElementById("address").value.trim(),
-    date: document.getElementById("date").value,
+    date: document.getElementById("date").value || '',
     status: "new",
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  // Save to Firestore
   db.collection("bookings").add(data)
     .then(() => {
-      // Send Email
       emailjs.send("service_glkvhot", "template_v6qi0el", data)
         .then(() => {
           document.getElementById("msg").textContent = "✔ تم إرسال الطلب بنجاح!";

@@ -3,74 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>لوحة التحكم - ASH</title>
+<title>احجز خدمة - ASH</title>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<!-- Firebase Compat -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>لوحة التحكم - الطلبات</h2>
 
-<p><button id="logout-btn">تسجيل الخروج</button></p>
+<div style="text-align:center; margin-bottom:20px;">
+  <img src="logo.png" alt="ASH Window Cleaning" style="max-width:200px;">
+</div>
 
-<table id="bookings-table" border="1" cellpadding="5" cellspacing="0">
-  <thead>
-    <tr>
-      <th>الاسم</th>
-      <th>رقم الهاتف</th>
-      <th>الخدمة</th>
-      <th>العنوان</th>
-      <th>التاريخ</th>
-      <th>حالة الطلب</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<h2>احجز خدمة</h2>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+<form id="booking-form">
+  <label>الاسم</label>
+  <input id="name" required>
 
+  <label>رقم الهاتف</label>
+  <input id="phone" required>
+
+  <label>الخدمة</label>
+  <select id="service">
+    <option>تنظيف النوافذ</option>
+    <option>تنظيف الواجهات</option>
+    <option>خدمات دورية</option>
+  </select>
+
+  <label>العنوان</label>
+  <input id="address">
+
+  <label>التاريخ</label>
+  <input id="date" type="date">
+
+  <button type="submit">إرسال الطلب</button>
+</form>
+
+<p id="msg"></p>
+
+<script>
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
   authDomain: "admin-ash-f622c.firebaseapp.com",
   projectId: "admin-ash-f622c",
-  storageBucket: "admin-ash-f622c.firebasestorage.app",
+  storageBucket: "admin-ash-f622c.appspot.com",
   messagingSenderId: "76505742154",
-  appId: "1:76505742154:web:590ca78470cbe708cb1fb3",
-  measurementId: "G-0N1HEG1XRG"
+  appId: "1:76505742154:web:dc4f190f9f2de80acb1fb3"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// EmailJS
+emailjs.init("dKDZhGvgDZ2OwDlZF");
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) window.location.href = "login.html";
-  else loadBookings();
-});
+// Submit Handler
+document.getElementById("booking-form").addEventListener("submit", function(e){
+  e.preventDefault();
 
-async function loadBookings() {
-  const tableBody = document.querySelector("#bookings-table tbody");
-  tableBody.innerHTML = "";
-  const querySnapshot = await getDocs(collection(db, "bookings"));
-  querySnapshot.forEach(doc => {
-    const data = doc.data();
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${data.name}</td>
-      <td>${data.phone}</td>
-      <td>${data.service}</td>
-      <td>${data.address}</td>
-      <td>${data.date}</td>
-      <td>${data.status}</td>
-    `;
-    tableBody.appendChild(row);
-  });
-}
+  const data = {
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    service: document.getElementById("service").value,
+    address: document.getElementById("address").value.trim(),
+    date: document.getElementById("date").value || '',
+    status: "new",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
 
-document.getElementById("logout-btn").addEventListener("click", () => {
-  signOut(auth).then(() => window.location.href = "login.html");
+  db.collection("bookings").add(data)
+    .then(() => {
+      emailjs.send("service_glkvhot", "template_v6qi0el", data)
+        .then(() => {
+          document.getElementById("msg").textContent = "✔ تم إرسال الطلب بنجاح!";
+          document.getElementById("booking-form").reset();
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("msg").textContent = "❗ تم الحفظ لكن لم يتم إرسال الإيميل.";
+        });
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("msg").textContent = "❌ حدث خطأ، حاول مرة أخرى.";
+    });
 });
 </script>
+
 </body>
 </html>

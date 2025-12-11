@@ -2,22 +2,134 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ASH Window Cleaning - الصفحة الرئيسية</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASH Window Cleaning</title>
+
+<!-- Bootstrap CSS for layout -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+body { font-family: Arial, sans-serif; line-height:1.6; }
+header { background-color:#4CAF50; color:white; padding:20px 0; text-align:center; }
+header img { max-width:150px; }
+section { padding:60px 20px; }
+h2 { margin-bottom:30px; }
+.service-card { border:1px solid #ddd; padding:20px; text-align:center; border-radius:10px; transition:0.3s; }
+.service-card:hover { box-shadow:0 0 10px rgba(0,0,0,0.2); }
+#booking-form input, #booking-form select, #booking-form button { margin-bottom:15px; width:100%; padding:10px; }
+footer { background:#333; color:white; text-align:center; padding:20px 0; }
+#msg { margin-top:10px; font-weight:bold; }
+</style>
 </head>
 <body>
-<header class="site-header">
-  <div class="logo">ASH Window Cleaning</div>
-  <nav><a href="booking.html">احجز خدمة</a> | <a href="login.html">لوحة التحكم</a></nav>
+
+<header>
+  <img src="logo.png" alt="ASH Window Cleaning">
+  <h1>ASH Window Cleaning</h1>
 </header>
 
-<main class="hero">
-  <h1>نظافة الزجاج — احترافية وسرعة</h1>
-  <p>نخدم المنازل، المحلات، المكاتب والواجهات الكبيرة.</p>
-  <a class="cta" href="booking.html">احجز الآن</a>
-</main>
+<section id="about">
+  <div class="container">
+    <h2>من نحن</h2>
+    <p>شركة ASH متخصصة في تنظيف النوافذ والواجهات وتقديم خدمات دورية احترافية للمنازل والمكاتب.</p>
+  </div>
+</section>
 
-<footer>© 2025 ASH Window Cleaning</footer>
+<section id="services">
+  <div class="container">
+    <h2>خدماتنا</h2>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="service-card">تنظيف النوافذ</div></div>
+      <div class="col-md-4"><div class="service-card">تنظيف الواجهات</div></div>
+      <div class="col-md-4"><div class="service-card">خدمات دورية</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="booking">
+  <div class="container">
+    <h2>احجز خدمة الآن</h2>
+    <form id="booking-form">
+      <input id="name" placeholder="الاسم" required>
+      <input id="phone" placeholder="رقم الهاتف" required>
+      <select id="service">
+        <option>تنظيف النوافذ</option>
+        <option>تنظيف الواجهات</option>
+        <option>خدمات دورية</option>
+      </select>
+      <input id="address" placeholder="العنوان">
+      <input id="date" type="date">
+      <button type="submit">إرسال الطلب</button>
+    </form>
+    <p id="msg"></p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <h2>اتصل بنا</h2>
+    <p>الهاتف: +216 24 598 941 | +216 51 084 442</p>
+    <p>البريد الإلكتروني: mmzhoussem@gmail.com</p>
+</div>
+</section>
+
+<footer>
+  &copy; 2025 ASH Window Cleaning
+</footer>
+
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAJxzFknapSh0fnPfIXwEEK3OijSKlqxco",
+  authDomain: "admin-ash-f622c.firebaseapp.com",
+  projectId: "admin-ash-f622c",
+  storageBucket: "admin-ash-f622c.appspot.com",
+  messagingSenderId: "76505742154",
+  appId: "1:76505742154:web:dc4f190f9f2de80acb1fb3"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// EmailJS
+emailjs.init("dKDZhGvgDZ2OwDlZF");
+
+// Booking submit
+document.getElementById("booking-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  const data = {
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    service: document.getElementById("service").value,
+    address: document.getElementById("address").value.trim(),
+    date: document.getElementById("date").value || '',
+    status: "new",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection("bookings").add(data)
+    .then(() => {
+      emailjs.send("service_glkvhot", "template_v6qi0el", data)
+        .then(() => {
+          document.getElementById("msg").textContent = "✔ تم إرسال الطلب بنجاح!";
+          document.getElementById("booking-form").reset();
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("msg").textContent = "❗ تم الحفظ لكن لم يتم إرسال الإيميل.";
+        });
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("msg").textContent = "❌ حدث خطأ، حاول مرة أخرى.";
+    });
+});
+</script>
+
 </body>
 </html>
